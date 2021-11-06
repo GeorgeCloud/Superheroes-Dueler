@@ -1,4 +1,5 @@
-import dog, hero
+import dog
+import hero
 
 my_dog = dog.Dog("Rex", "SuperDog")
 my_dog.bark()
