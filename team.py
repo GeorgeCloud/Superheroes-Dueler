@@ -31,16 +31,13 @@ class Team:
                 defending_hero.fight(attacking_hero)
             else:
                 living_opponents.remove(defending_hero)
-                self.kill += 1
+                self.kills += 1
                 other_team.deaths += 1
 
         if len(living_heroes) > 0:
             print(f'{self.name} Wins!')
         else:
             print(f'{other_team.name} Wins!')
-
-        self.stats()
-        other_team.stats()
 
     def remove_hero(self, name):
         for hero in self.heroes:
