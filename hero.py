@@ -1,8 +1,3 @@
-from ability import Ability
-from weapon import Weapon
-from armor import Armor
-from team import Team
-
 YELLOW = '\033[93m'
 RED = '\033[91m'
 ENDC = '\033[0m'
@@ -17,6 +12,7 @@ class Hero:
         self.current_health = starting_health
         self.deaths = 0
         self.kills = 0
+        self.team = None
 
     def __str__(self):
         return f'HERO: {self.name}\ncurrent health: {self.current_health}'
@@ -37,17 +33,19 @@ class Hero:
         self.weapons.append(weapon)
 
     def fight(self, opponent):
-        if opponent.is_alive():
-            for ability in self.abilities:
-                attack_damage = ability.attack()
-                print(f'{self.name} attacked {opponent.name} for {attack_damage}!')
+        if self.is_alive() and opponent.is_alive():
+            attack_moves = self.abilities or self.weapons
+            for attack_move in attack_moves:
+                attack_damage = attack_move.attack()
+                print(f'-{self.name} attacked {opponent.name} for {attack_damage}!-')
 
-                if opponent.defended(ability, attack_damage):
-                    self.abilities.remove(ability)
+                opponent.defended(attack_move, attack_damage)
                 if opponent.is_alive():
-                    print(f'{YELLOW + opponent.name} is still alive with {opponent.current_health}{ENDC}')
+                    print(f'{YELLOW + opponent.name} is still alive with {opponent.current_health}{ENDC}\n')
                 else:
-                    print(f'{RED + opponent.name} died!{ENDC}')
+                    print(f'{RED + opponent.name} died!{ENDC}\n')
+                    self.add_kill(1)
+                    opponent.add_death(1)
                     return
 
     def defended(self, ability, attack_damage):
@@ -56,7 +54,8 @@ class Hero:
                 armor_health = armor.block()
 
                 if armor_health - attack_damage > 0:
-                    return True  # unbroken armor, regenerates for next fight
+                    print("BLOCKED!")
+                    return  # unbroken armor, regenerates for next fight
                 else:
                     attack_damage -= armor_health
                     self.armors.remove(armor)
@@ -72,46 +71,3 @@ class Hero:
 
     def is_alive(self):
         return self.current_health > 0
-
-
-if __name__ == '__main__':
-    # Team 1 attack moves
-    bite = Ability('Bite', 10)
-    sword = Weapon('Sword', 10)
-
-    # Team 2 attack moves
-    ray_gun = Weapon('Space Gun', 10)
-    fireball = Ability('Fire Ball', 10)
-
-    # Armor
-    wither_armor  = Armor("Wither Armor", 15)
-    diamond_armor = Armor("Diamond Armor", 10)
-    iron_armor    = Armor("Iron Armor", 5)
-    blanket_armor = Armor("Blanket Armor", 1)
-
-    # Team 1
-    team_candy = Team('Candy Kingdom')
-    hero1 = Hero('Finn The Human', 10)
-    hero1.add_weapon(sword)
-    hero1.add_armor(blanket_armor)
-
-    hero2 = Hero('Marceline the vampire', 10)
-    hero2.add_ability(bite)
-    hero2.add_armor(wither_armor)
-
-    # Team 2
-    team_fire  = Team('Fire Kingdom')
-    hero3 = Hero('Princess BubbleGum', 10)
-    hero3.add_weapon(sword)
-    hero3.add_armor(diamond_armor)
-
-    hero4 = Hero('Flame Princess', 10)
-    hero4.add_ability(fireball)
-    hero4.add_armor(iron_armor)
-
-    team_candy.add_heroes([hero1, hero2])
-
-    team_fire.add_heroes([hero3, hero4])
-
-    # hero2.fight(hero1)
-
